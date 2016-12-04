@@ -1,5 +1,8 @@
 package homework1;
 
+import java.io.*;
+import Math.*;
+import java.lang.*;
 /**
  * A GeoPoint is a point on the earth. GeoPoints are immutable.
  * <p>
@@ -53,7 +56,12 @@ public class GeoPoint {
      * "flat earth" simplification.
      */
   	public static final double KM_PER_DEGREE_LONGITUDE = 93.681;
-  	
+
+	public static int gp_long;
+	public static int gp_lat;
+
+    public static final double milDegLat2KM = KM_PER_DEGREE_LATITUDE/1000000;
+    public static final double milDegLng2KM = KM_PER_DEGREE_LONGITUDE/1000000;
 	// Implementation hint:
 	// Doubles and floating point math can cause some problems. The exact
 	// value of a double can not be guaranteed except within some epsilon.
@@ -79,6 +87,10 @@ public class GeoPoint {
    	 **/
   	public GeoPoint(int latitude, int longitude) {
   		// TODO Implement this constructor
+		if (latitude < MIN_LATITUDE || latitude > MAX_LATITUDE || longitude > MAX_LONGITUDE || longitude < MIN_LONGITUDE )
+			throw new IllegalArgumentException("invalid input");
+		gp_lat = latitude;
+		gp_long = longitude;
   	}
 
   	 
@@ -87,7 +99,7 @@ public class GeoPoint {
      * @return the latitude of this in millionths of degrees.
      */
   	public int getLatitude() {
-  		// TODO Implement this method
+  		return gp_lat;
   	}
 
 
@@ -96,7 +108,7 @@ public class GeoPoint {
      * @return the latitude of this in millionths of degrees.
      */
   	public int getLongitude() {
-  		// TODO Implement this method
+  		return gp_long;
   	}
 
 
@@ -107,7 +119,23 @@ public class GeoPoint {
      *         the Technion approximation.
      **/
   	public double distanceTo(GeoPoint gp) {
-  		// TODO Implement this method
+		if (gp==null)
+			throw new IllegalArgumentException("invalid input");
+		double lat1 = (double)this.getLatitude();
+		double lat2 = (double)gp.getLatitude();
+		double lng1 = (double)this.getLongitude();
+		double lng2 = (double)gp.getLongitude();
+//		double earthRadius = 6371000; //meters
+//		double dLat = Math.toRadians(lat2-lat1);
+//		double dLng = Math.toRadians(lng2-lng1);
+//		double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+//				Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+//						Math.sin(dLng/2) * Math.sin(dLng/2);
+//		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+//		double dist = (double) (earthRadius * c);
+        double dlat = (lat1-lat2)*milDegLat2KM;
+        double dlng = (lng1-lng2)*milDegLng2KM;
+        return Math.sqrt(dlat*dlat+dlng*dlng);
   	}
 
 
@@ -129,8 +157,11 @@ public class GeoPoint {
 		 // degrees and degrees increase in the clockwise direction. By
 		 // mathematical convention, "east" is 0 degrees, and degrees
 		 // increase in the counterclockwise direction. 
-		 
-  		// TODO Implement this method
+		if (gp == null || this.equals(gp))
+			throw new IllegalArgumentException("invalid input");
+		double new_lng = (double) gp.getLongitude() - this.getLongitude();
+		double new_lat = (double) gp.getLatitude() - this.getLatitude();
+		return Math.atan2(milDegLat2KM*new_lat,milDegLng2KM*new_lng)+90;
   	}
 
 
@@ -140,7 +171,7 @@ public class GeoPoint {
      * 		   gp.latitude = this.latitude && gp.longitude = this.longitude
      **/
   	public boolean equals(Object gp) {
-  		// TODO Implement this method
+  		return (gp.getLongitude() == this.getLongitude())&& (gp.getLatitude() == this.getLatitude());
   	}
 
 
@@ -151,7 +182,7 @@ public class GeoPoint {
   	public int hashCode() {
     	// This implementation will work, but you may want to modify it
     	// for improved performance.
-
+		//TODO: think on something better
     	return 1;
   	}
 
@@ -161,7 +192,7 @@ public class GeoPoint {
      * @return a string representation of this GeoPoint.
      **/
   	public String toString() {
-  		// TODO Implement this method
+  		return "x: "+this.getLongitude()+" y: "+this.getLatitude();
   	}
 
 }
